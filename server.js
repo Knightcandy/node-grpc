@@ -8,7 +8,8 @@ const server = new grpc.Server();
 server.bind('0.0.0.0:40000', grpc.ServerCredentials.createInsecure());
 server.addService(todoPackage.Todo.service, {
     createTodo,
-    readTodos
+    readTodos,
+    readTodosStream
 });
 
 server.start();
@@ -23,4 +24,12 @@ function createTodo(call, callback) {
     callback(null, todoItem);
     console.log(todoItem)
 }
-function readTodos() {}
+
+function readTodos(call, callback) {
+    callback(null, {items: todos})
+}
+
+function readTodosStream(call, callback) {
+    todos.forEach(t => call.write(t));
+    call.end();
+}
